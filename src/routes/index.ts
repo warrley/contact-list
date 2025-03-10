@@ -28,3 +28,15 @@ router.post("/contact", async (req, res) => {
 
     res.status(201).json({ contact: name });
 });
+
+router.get("/contact", async (req, res) => {
+    let list: string[] = [];
+    try {
+        const usersList = await readFile(dataSource, { encoding: "utf-8" });    
+        list = usersList.split("\n");
+    } catch {
+
+    }
+
+    res.json({ users: list });
+})
