@@ -40,3 +40,24 @@ router.get("/contact", async (req, res) => {
 
     res.json({ users: list });
 })
+
+router.delete("/contact", async (req, res) => {
+    let name = req.query.name;
+
+    if (!name) {
+        res.json({ error: "need send a name to exclude." });
+        return;
+    }
+
+    let list: string[] = [];
+    
+    try {
+        const contentList = await readFile(dataSource, { encoding: "utf-8" });
+        list = contentList.split("\n");
+    } catch(err) { }
+    
+    list = list.filter(n => n.toUpperCase() !== (name as string).toUpperCase());
+    await writeFile(dataSource, list.join("\n"));
+
+    res.json({ contacts: list });
+})
