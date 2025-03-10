@@ -1,7 +1,5 @@
 import { Router } from 'express'
-import { readFile, writeFile } from 'fs/promises';
-
-const dataSource = "./data/list.txt"
+import { createContact, deleteContact, getContacts } from '../service/contact';
 
 export const router = Router();
 
@@ -13,30 +11,13 @@ router.post("/contact", async (req, res) => {
         return;
     }
 
-    let list: string[] = [];
-
-    try {
-        const data = await readFile(dataSource, { encoding: "utf-8" });
-        list = data.split("\n")
-    } catch (err) {
-        
-    }
-
-    list.push(name);
-
-    await writeFile(dataSource, list.join("\n"));
+    await createContact(name);
 
     res.status(201).json({ contact: name });
 });
 
 router.get("/contact", async (req, res) => {
-    let list: string[] = [];
-    try {
-        const usersList = await readFile(dataSource, { encoding: "utf-8" });    
-        list = usersList.split("\n");
-    } catch {
-
-    }
+    let list = await getContacts();
 
     res.json({ users: list });
 })
@@ -49,15 +30,9 @@ router.delete("/contact", async (req, res) => {
         return;
     }
 
-    let list: string[] = [];
+    let list = await getContacts();
     
-    try {
-        const contentList = await readFile(dataSource, { encoding: "utf-8" });
-        list = contentList.split("\n");
-    } catch(err) { }
-    
-    list = list.filter(n => n.toUpperCase() !== (name as string).toUpperCase());
-    await writeFile(dataSource, list.join("\n"));
+    await deleteContact(name as string);
 
     res.json({ contacts: list });
 })
